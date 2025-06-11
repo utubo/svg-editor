@@ -217,20 +217,19 @@ function refreshGridSize() {
 }
 refreshGridSize();
 function refreshViewSize() {
-  if (!dest.height) return;
-  cont.parentNode.style.height = `${dest.height * Number(zoom.value)}px`;
-  cont.style.height = `${dest.height}px`;
+  const height = dest.height || 64;
+  cont.parentNode.style.height = `${height * Number(zoom.value)}px`;
+  cont.style.height = `${height}px`;
   cont.style.transform = `scale(${zoom.value})`;
-}
-// NOTE: The height is updated after a delay.
-dest.onload = function () {
-  setTimeout(refreshViewSize, 10);
 }
 function refreshSvg() {
   const minified = minify(src.value);
   const uri = 'data:image/svg+xml;utf8,' + minified.replace(/#/g, '%23');
   dataUri.value = (stringType.value === 'url') ? `url('${uri}');` : minified;
   dest.src = uri;
+  // NOTE: The height is updated after a delay.
+  // NOTE: Invalid svg does not trigger onload.
+  setTimeout(refreshViewSize, 10);
 }
 let timer;
 function refreshSvgLazy() {
