@@ -1,0 +1,275 @@
+<html>
+<head>
+  <title>.SVG Editor</title>
+  <link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 32 32"><path fill="%2386d" d="M8 3s-4 1-5 5q-1 8 0 16s1 4 5 5q 8 1 16 0s 4-1 5-5q1-8 0-16s-1-4-5-5q-8-1-16 0z"/><g stroke="%23fff" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M10 11l-5 5 5 5"/><path d="M22 11l 5 5-5 5"/><path d="M19.2 8.4l-4.5 9 1.4 0.7z"/><path stroke="none" fill="%23fff" d="M11.7 23.5c5 0 5-3 4-4s-4-0.5-3.5 2s-0.4 1.4-0.1 2z"/></g></svg>'>
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@utbtb">
+  <meta property="og:title" content=".SVG Editor">
+  <meta property="og:description" content="A simple SVG code editor">
+  <meta property="og:image" content="https://utubo.github.io/svg-editor/favicon.png">
+  <meta property="og:url" content="https://utubo.github.io/svg-editor/">
+  <style>
+.svg-container-container {
+  text-align: center;
+  transition: .4s ease-in;
+}
+.svg-container {
+  background-color: #fff;
+  background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" fill="rgba(0,0,0,.1)" width="4" height="4"><path d="M0 0 0 2 4 2 4 4 2 4 2 0"/></svg>');
+  background-size: 25%;
+  background-position: center;
+  display: inline-block;
+  text-align: center;
+  transition: .4s ease-in;
+  transform-origin: top;
+  width: auto;
+}
+#dest {
+  max-height: 256px;
+}
+.darkbg {
+  background-color: #444;
+}
+#src, #dataUri {
+  border-radius: 5px;
+  margin: 5px 0;
+  width: 100%;
+}
+#src {
+  height: calc(100% - 330px);
+  min-height: 5em;
+}
+#dataUri {
+  display: block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+.hidden {
+  display: none;
+}
+textarea, button, select, input, input[type=checkbox]+label {
+  border-radius: 5px;
+  border: none;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  font-size: .8rem;
+  outline: 1px solid transparent;
+  padding: 4px 12px;
+  transition: .3s;
+  vertical-align: middle;
+}
+textarea {
+  font-family: monospace;
+}
+input[type=checkbox] {
+  display: none;
+}
+input[type=checkbox]+label {
+  border: 1px solid;
+}
+
+/* color scheme */
+::selection {
+  background: #6bd;
+  color: #ffe;
+}
+body {
+  background:#444;
+  color: #e0e0f0;
+}
+textarea:focus, input:focus {
+  outline-color: #efffff;
+}
+button, select {
+  background: #ddd;
+}
+button:hover, button:focus,
+select:hover, select:focus,
+input:checked+label {
+  background: #efffff;
+  color: #655 !important;
+}
+input[type=checkbox]+label:focus,
+input[type=checkbox]+label:hover {
+  color: #efffff;
+}
+#src {
+  background:#333;
+  color: #ddd;
+}
+#dataUri {
+  background: #666;
+  color: #c0f0f0;
+}
+  </style>
+</head>
+<body>
+
+<div class="svg-container-container">
+  <div id="svgContainer" class="svg-container">
+    <img src="" id="dest">
+  </div>
+</div>
+
+<textarea id="src" oninput="refreshSvgLazy()">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="192" height="192" viewBox="0 0 32 32">
+<path fill="#86d" d="M8 3s-4 1-5 5q-1 8 0 16s1 4  5 5q 8 1 16 0s 4-1 5-5q1-8 0-16s-1-4-5-5q-8-1-16 0z"/>
+<g stroke="#fff" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M10 11l-5 5 5 5"/>
+  <path d="M22 11l 5 5-5 5"/>
+  <path d="M19.2 8.4l-4.5 9 1.4 0.7z"/>
+  <path stroke="none" fill="#fff" d="M11.7 23.5c5 0 5-3 4-4s-4-0.5-3.5 2s-0.4 1.4-0.1 2z"/>
+</g>
+</svg>
+</textarea>
+
+<input id="spin" type="checkbox" onclick="toggleSpin();">
+<label for="spin" tabindex="0">Spin</label>
+
+<input id="togglebg" type="checkbox" onclick="toggleBg();">
+<label for="togglebg" tabindex="0">Dark&lt;-&gt;Light</label>
+
+<select id="gridSize" oninput="refreshGridSize()">
+  <option value="100%">Grid 2x2</option>
+  <option value="50%">Grid 4x4</option>
+  <option value="25%" selected>Grid 8x8</option>
+  <option value="12.5%">Grid 16x16</option>
+  <option value="6.25%">Grid 32x32</option>
+</select>
+
+<select id="zoom" oninput="refreshViewSize()">
+  <option value="1" selected>Zoom x1</option>
+  <option value="2">Zoom x2</option>
+  <option value="5">Zoom x5</option>
+  <option value="10">Zoom x10</option>
+</select>
+
+<hr>
+
+<select id="stringType" oninput="refreshSvg()">
+  <option value="url" selected>URL for CSS</option>
+  <option value="minify">Minify XML</option>
+</select>
+<button onclick="copyToClipBoard();">Copy</button>
+<button onclick="toPngFile();">.PNG</button>
+<button onclick="toIcoFile();">.ICO</button>
+<button onclick="toSvgFile();">.SVG</button>
+<br>
+<input type="text" id="dataUri" onclick="this.select();">
+
+<div class="hidden">
+  <canvas id="workCanvas"></canvas>
+  <a id="blob" type="application/octet-stream"></a>
+</div>
+
+<script>
+function minify(src) {
+  let s = src
+    .replace(/<!\-\-.+\-\->/g, '')
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*(\/>|=|<|>)\s*/g, '$1')
+    .replace(/(\d)\s+([^\d])/g, '$1$2')
+    .replace(/>\s+</g, '><');
+  if (src.indexOf('xlink:') === -1) {
+    s = s.replace('xmlns:xlink="http://www.w3.org/1999/xlink" ', '');
+  }
+  return s;
+}
+// SVG data
+const dest = document.getElementById('dest');
+const src = document.getElementById('src');
+const workCanvas = document.getElementById('workCanvas');
+const dataUri = document.getElementById('dataUri');
+const blobLink = document.getElementById('blob');
+// View and tools
+const cont = document.getElementById('svgContainer');
+const spin = document.getElementById('spin');
+const stringType = document.getElementById('stringType');
+const gridSize = document.getElementById('gridSize');
+const zoom = document.getElementById('zoom');
+// NOTE: force reset
+document.getElementById('togglebg').checked = true;
+
+function refreshGridSize() {
+  cont.style.backgroundSize= gridSize.value;
+}
+refreshGridSize();
+function refreshViewSize() {
+  if (!dest.height) return;
+  cont.parentNode.style.height = `${dest.height * Number(zoom.value)}px`;
+  cont.style.height = `${dest.height}px`;
+  cont.style.transform = `scale(${zoom.value})`;
+}
+// NOTE: The height is updated after a delay.
+dest.onload = function () {
+  setTimeout(refreshViewSize, 10);
+}
+function refreshSvg() {
+  const minified = minify(src.value);
+  const uri = 'data:image/svg+xml;utf8,' + minified.replace(/#/g, '%23');
+  dataUri.value = (stringType.value === 'url') ? `url('${uri}');` : minified;
+  dest.src = uri;
+}
+let timer;
+function refreshSvgLazy() {
+  clearTimeout(timer);
+  timer = setTimeout(refreshSvg, 500);
+}
+function toggleSpin() {
+  if (spin.checked) {
+    dest.classList.add('spin');
+  } else {
+    dest.classList.remove('spin');
+  }
+}
+function toggleBg() {
+  cont.classList.toggle('darkbg');
+}
+function toFile(filename, contentType, option = 1) {
+  const ctx = workCanvas.getContext('2d');
+  const img = new Image();
+  img.onload = function() {
+    workCanvas.width = img.width;
+    workCanvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    blobLink.download = filename;
+    workCanvas.toBlob(downloadBlob, contentType, option);
+  }
+  img.src = dest.src;
+}
+function downloadBlob(b) {
+    blobLink.href = window.URL.createObjectURL(b);
+    blobLink.click();
+}
+function toPngFile() {
+  toFile('image.png', 'image/png');
+}
+function toIcoFile() {
+  toFile('icon.ico', 'image/vnd.microsoft.icon', '-moz-parse-options:format=bmp;bpp=32');
+}
+function toSvgFile() {
+  blobLink.href = URL.createObjectURL(new Blob([src.value],{type:"text/plan"}));
+  blobLink.download = 'image.svg';
+  blobLink.click();
+}
+function copyToClipBoard() {
+  dataUri.select();
+  if (window.clipboardData) {
+    clipboardData.setData('Text', dataUri.value);
+  } else {
+    document.execCommand('copy');
+  }
+}
+refreshSvg();
+</script>
+
+</body>
+</html>
+
