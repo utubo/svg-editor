@@ -1,8 +1,8 @@
 <html>
 <head>
-	<meta charset="utf-8">
+  <meta charset="utf-8">
   <title>.SVG Editor</title>
-	<meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width">
   <link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 32 32"><path fill="%2386d" d="M8 3s-4 1-5 5q-1 8 0 16s1 4 5 5q 8 1 16 0s 4-1 5-5q1-8 0-16s-1-4-5-5q-8-1-16 0z"/><g stroke="%23fff" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M10 11l-5 5 5 5"/><path d="M22 11l 5 5-5 5"/><path d="M19.2 8.4l-4.5 9 1.4 0.7z"/><path stroke="none" fill="%23fff" d="M11.7 23.5c5 0 5-3 4-4s-4-0.5-3.5 2s-0.4 1.4-0.1 2z"/></g></svg>'>
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@utbtb">
@@ -11,6 +11,17 @@
   <meta property="og:image" content="https://utubo.github.io/svg-editor/favicon.png">
   <meta property="og:url" content="https://utubo.github.io/svg-editor/">
   <style>
+/* view */
+body {
+  margin: 0;
+  padding: 0;
+}
+.flex {
+  display: flex;
+  flex-flow: column;
+  height: calc(100vh - 2rem);
+  padding: 1rem;
+}
 .svg-container-container {
   text-align: center;
   transition: .4s ease-in;
@@ -26,25 +37,9 @@
   transform-origin: top;
   width: auto;
 }
-#dest {
-  max-height: 256px;
-}
 .darkbg {
   background-color: #444;
 }
-#src, #dataUri {
-  border-radius: 5px;
-  margin: 5px 0;
-  width: 100%;
-}
-#src {
-  height: calc(100% - 330px);
-  min-height: 5em;
-}
-#dataUri {
-  display: block;
-}
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -55,6 +50,8 @@
 .hidden {
   display: none;
 }
+
+/* form */
 textarea, button, select, input, input[type=checkbox]+label {
   border-radius: 5px;
   border: none;
@@ -66,14 +63,22 @@ textarea, button, select, input, input[type=checkbox]+label {
   transition: .3s;
   vertical-align: middle;
 }
-textarea {
+textarea, input[type=text] {
+  border-radius: 5px;
   font-family: monospace;
+  display: block;
+  margin: 5px 0;
+  width: 100%;
 }
 input[type=checkbox] {
   display: none;
 }
 input[type=checkbox]+label {
   border: 1px solid;
+}
+#src {
+  min-height: 5em;
+  flex-grow: 1;
 }
 
 /* color scheme */
@@ -113,6 +118,8 @@ input[type=checkbox]+label:hover {
 </head>
 <body>
 
+<div class="flex">
+
 <div class="svg-container-container">
   <div id="svgContainer" class="svg-container">
     <img src="" id="dest">
@@ -131,39 +138,45 @@ input[type=checkbox]+label:hover {
 </svg>
 </textarea>
 
-<input id="spin" type="checkbox" onclick="toggleSpin();">
-<label for="spin" tabindex="0">Spin</label>
+<div>
+  <input id="spin" type="checkbox" onclick="toggleSpin();">
+  <label for="spin" tabindex="0">Spin</label>
 
-<input id="togglebg" type="checkbox" onclick="toggleBg();">
-<label for="togglebg" tabindex="0">Dark&lt;-&gt;Light</label>
+  <input id="togglebg" type="checkbox" onclick="toggleBg();">
+  <label for="togglebg" tabindex="0">Dark&lt;-&gt;Light</label>
 
-<select id="gridSize" oninput="refreshGridSize()">
-  <option value="100%">Grid 2x2</option>
-  <option value="50%">Grid 4x4</option>
-  <option value="25%" selected>Grid 8x8</option>
-  <option value="12.5%">Grid 16x16</option>
-  <option value="6.25%">Grid 32x32</option>
-</select>
+  <select id="gridSize" oninput="refreshGridSize()">
+    <option value="100%">Grid 2x2</option>
+    <option value="50%">Grid 4x4</option>
+    <option value="25%" selected>Grid 8x8</option>
+    <option value="12.5%">Grid 16x16</option>
+    <option value="6.25%">Grid 32x32</option>
+  </select>
 
-<select id="zoom" oninput="refreshViewSize()">
-  <option value="1" selected>Zoom x1</option>
-  <option value="2">Zoom x2</option>
-  <option value="5">Zoom x5</option>
-  <option value="10">Zoom x10</option>
-</select>
+  <select id="zoom" oninput="refreshViewSize()">
+    <option value="1" selected>Zoom x1</option>
+    <option value="2">Zoom x2</option>
+    <option value="5">Zoom x5</option>
+    <option value="10">Zoom x10</option>
+  </select>
+</div>
 
 <hr>
 
-<select id="stringType" oninput="refreshSvg()">
-  <option value="url" selected>URL for CSS</option>
-  <option value="minify">Minify XML</option>
-</select>
-<button onclick="copyToClipBoard();">Copy</button>
-<button onclick="toPngFile();">.PNG</button>
-<button onclick="toIcoFile();">.ICO</button>
-<button onclick="toSvgFile();">.SVG</button>
-<br>
+<div>
+  <select id="stringType" oninput="refreshSvg()">
+    <option value="url" selected>URL for CSS</option>
+    <option value="minify">Minify XML</option>
+  </select>
+  <button onclick="copyToClipBoard();">Copy</button>
+  <button onclick="toPngFile();">.PNG</button>
+  <button onclick="toIcoFile();">.ICO</button>
+  <button onclick="toSvgFile();">.SVG</button>
+</div>
+
 <input type="text" id="dataUri" onclick="this.select();">
+
+</div>
 
 <div class="hidden">
   <canvas id="workCanvas"></canvas>
