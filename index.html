@@ -199,6 +199,15 @@ function minify(src) {
   }
   return s;
 }
+function unpack(src) {
+  if (src.indexOf('data:image/svg+xml;utf8,') === -1) return src;
+  return decodeURIComponent(src
+    .replace(/^.*<svg /, '<svg ')
+    .replace(/<\/svg>.*/, '</svg>')
+    .replace(/'/g, '"')
+    .replace(/></g, '>\n<')
+  );
+}
 // SVG data
 const dest = document.getElementById('dest');
 const src = document.getElementById('src');
@@ -229,6 +238,7 @@ dest.onload = () => {
   setTimeout(refreshViewSize, 10);
 };
 function refreshSvg() {
+  src.value = unpack(src.value);
   const minified = minify(src.value);
   const uri = 'data:image/svg+xml;utf8,' + minified.replace(/#/g, '%23');
   dataUri.value =
