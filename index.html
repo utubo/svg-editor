@@ -167,6 +167,7 @@ input[type=checkbox]+label:hover {
 <div>
   <select id="stringType" oninput="refreshSvg()">
     <option value="url" selected>URL for CSS</option>
+    <option value="href">URL for href</option>
     <option value="minify">Minify XML</option>
   </select>
   <button onclick="copyToClipBoard();">Copy</button>
@@ -230,7 +231,10 @@ dest.onload = () => {
 function refreshSvg() {
   const minified = minify(src.value);
   const uri = 'data:image/svg+xml;utf8,' + minified.replace(/#/g, '%23');
-  dataUri.value = (stringType.value === 'url') ? `url('${uri}');` : minified;
+  dataUri.value =
+    (stringType.value === 'url') ? `url('${uri.replace(/'/g, '"')}');` :
+    (stringType.value === 'href') ? `href="${uri.replace(/"/g, "'")}"` :
+    minified;
   dest.src = uri;
 }
 let timer;
