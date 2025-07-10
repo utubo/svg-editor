@@ -240,7 +240,7 @@ dest.onload = () => {
 function refreshSvg() {
   src.value = unpack(src.value);
   const minified = minify(src.value);
-  const encode = minified.match(/^[\x00-\x7F]*$/) '' : ';utf8'
+  const encode = minified.match(/^[\x00-\x7F]*$/) ? '' : ';utf8'
   const uri = `data:image/svg+xml${encode},${minified.replace(/#/g, '%23')}`;
   dataUri.value =
     (stringType.value === 'url') ? `url('${uri.replace(/'/g, '"')}');` :
